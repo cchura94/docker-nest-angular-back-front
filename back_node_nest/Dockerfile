@@ -1,6 +1,6 @@
-FROM node:22-alpine3.22 AS builder
+FROM node:22-alpine3.22
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
 COPY package*.json ./
 
@@ -10,14 +10,4 @@ COPY . .
 
 RUN npm run build
 
-# Production
-
-FROM node:22-alpine
-
-WORKDIR /app
-
-COPY --from=builder /app/dist ./dist
-
-EXPOSE 3000
-
-CMD [ "node", "dist/src/main.js" ]
+CMD [ "node", "dist/main.js" ]
