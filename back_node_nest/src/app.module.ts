@@ -21,7 +21,7 @@ import { NotaModule } from './modules/admin/nota/nota.module';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost'/*process.env.DB_HOST || 'postgres_nest_db'*/,
+      host: 'pg_postgres'/*process.env.DB_HOST || 'postgres_nest_db'*/,
       port: 5432, // 5432 el puerto pueden cambiar
       username: 'postgres',
       password: 'admin54321',
