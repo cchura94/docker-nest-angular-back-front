@@ -1,0 +1,196 @@
+<div class="container mx-auto p-6">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Listado de Productos -->
+        <div class="bg-white p-4 rounded-lg shadow-md col-span-2">
+            <h2>Listado de producto a la venta </h2>
+
+            <p-table
+                #dt
+                [value]="products()"
+                [rows]="5"
+                [lazy]="true"
+                [totalRecords]="totalRecords()"
+                [loading]="loading()"
+                (onLazyLoad)="cargarDatos($event)"
+                [columns]="cols"
+                [paginator]="true"
+               
+                [rowHover]="true"
+                dataKey="id"
+                currentPageReportTemplate="Mostrando {first} al {last} de {totalRecords} Productos"
+                [showCurrentPageReport]="true"
+            >
+                <ng-template #caption>
+                    <div class="flex items-center justify-between">
+                        <h5 class="m-0">Productos</h5>
+
+                       <!-- <p-select [options]="sucursales()" [(ngModel)]="selectedSucursal" optionLabel="nombre" optionValue="id" placeholder="Seleccionar Sucursal" class="w-full md:w-56" (onChange)="funGetAlmacenes()" /> -->
+
+                        <p-select [options]="almacenes()" [(ngModel)]="selectedAlmacen" optionLabel="nombre" optionValue="id" placeholder="Seleccionar Almacen" class="w-full md:w-56" (onChange)="funGetProductos()" />
+
+                        <p-iconfield>
+                            <p-inputicon class="pi pi-search" />
+                            <input pInputText type="text" placeholder="Buscar..." [(ngModel)]="buscar" (input)="funGetProductos()" />
+                        </p-iconfield>
+                    </div>
+                </ng-template>
+                <ng-template #header>
+                    <tr>
+                        
+                        <th pSortableColumn="id" style="min-width:4rem">
+                            <div class="flex items-center gap-2">
+                                Nombre
+                                <p-sortIcon field="nombre" />
+                            </div>
+                        </th>
+                        <th>Image</th>
+                        <th pSortableColumn="precio_venta_actual" style="min-width: 2rem">
+                            <div class="flex items-center gap-2">
+                                Precio
+                                <p-sortIcon field="precio_venta_actual" />
+                            </div>
+                        </th>
+                        <th>Stock</th>
+                        
+                    </tr>
+                </ng-template>
+                <ng-template #body let-product>
+                    <tr>
+                        <td style="min-width: 4rem">{{ product.nombre }}</td>
+                        <td>
+                            @if (product.imagen_url) {
+                                <img [src]="'http://127.0.0.1:8000/' + product.imagen_url" [alt]="product.nombre" class="rounded" />
+                            }
+                        </td>
+                        <td>{{ product.precio_venta_actual | currency: 'USD' }}</td>
+                        <td>{{ calcularStock(product.almacens) }}</td>
+                        <td>
+                            <p-button icon="pi pi-plus" class="mr-2" [rounded]="true" [outlined]="false" (click)="addCarrito(product)" [disabled]="calcularStock(product.almacens)<=0" />
+                            
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+
+
+        </div>
+        <!-- Carrito - cliente - venta -->
+        <div class="bg-white p-4 rounded-lg shadow-md col-span-1">
+            <div class="mb-6">
+                <h2 class="text-xl font-semibold mb-2">carrito</h2> 
+
+                <p-table [value]="carrito()">
+                    <ng-template #header>
+                        <tr>
+                            <th>NOM</th>
+                            <th>PRECIO</th>
+                            <th>CANT</th>
+                            <th></th>
+                        </tr>
+                    </ng-template>
+                    <ng-template #body let-car>
+                        <tr>
+                            <td>{{ car.nombre }}</td>
+                            <td>{{ car.precio_venta_actual }}</td>
+                            <td>{{ car.cantidad }}</td>
+                            <td>
+                                <button class="bg-red-500 px-2 py-2 text-white rounded-md" (click)="quitarCarrito(car)">X</button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+
+            </div>
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-2">cliente</h3>
+                <div>
+                    <input pInputText id="buscaClie" class="flex-auto" autocomplete="off" placeholder="buscar Cliente" [(ngModel)]="search_clie" (input)="funGetEntidadComercial()" />
+
+                    <p-button (click)="showDialogCliente()" label="Nuevo Cliente" />
+                    <p-dialog header="Nuevo Cliente" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+                        <span class="p-text-secondary block mb-8">Ingrese Informacío de Cliente.</span>
+                        <div class="flex items-center gap-4 mb-4">
+                            <label for="tipo" class="font-semibold w-24">Tipo</label>
+                            <p-select  id="tipo" [options]="[{id: 1, nombre: 'Cliente'}, {id: 1, nombre: 'Proveedor'}]" optionLabel="nombre" placeholder="Seleccionar Cliente" class="w-full md:w-56" />
+
+<!--
+                            razon_social
+ci_nit_ruc_rut
+telefono
+direccion
+correo
+nombre_completo
+rol_contacto
+telefono_secundario
+correo_secundario
+observaciones
+                        -->
+
+                            <label for="username" class="font-semibold w-24">Username</label>
+                            <input pInputText id="username" class="flex-auto" autocomplete="off" />
+                        </div>
+                        <div class="flex items-center gap-4 mb-8">
+                            <label for="email" class="font-semibold w-24">Email</label>
+                            <input pInputText id="email" class="flex-auto" autocomplete="off" />
+                        </div>
+                        <div class="flex justify-end gap-2">
+                            <p-button label="Cancelar" severity="secondary" />
+                            <p-button label="Guardar Cliente" />
+                        </div>
+                    </p-dialog>
+
+                    @if (entidad_comercial().length != 0) {
+
+                        <p-table [value]="entidad_comercial()">
+                            <ng-template #header>
+                                <tr>
+                                    <th>TIPO</th>
+                                    <th>razon S.</th>
+                                    <th></th>
+                                </tr>
+                            </ng-template>
+                            <ng-template #body let-ec>
+                                <tr>
+                                    <td>{{ ec.tipo }}</td>
+                                    <td>{{ ec.razon_social }}</td>
+                                    <td>
+                                        <p-button icon="pi pi-plus" class="mr-2" [rounded]="true" [outlined]="false" (click)="seleccionarCliente(ec)" />
+                                    </td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    }
+                    @if(cliente_seleccionado().id){
+                        <div>
+                            <h4>Tipo Cliente: {{ cliente_seleccionado().tipo}}</h4>
+                            <h4>Razon Social: {{ cliente_seleccionado().razon_social}}</h4>
+                            <h4>ID: {{ cliente_seleccionado().ci_nit_ruc_rut}}</h4>
+                            <h4>Telefono: {{ cliente_seleccionado().telefono}}</h4>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-2">datos de venta</h3>
+                <div class="flex justify-between mb-4">
+                    <span>Total</span>
+                    <span>$30.00</span>
+                </div>
+                <!--<div class="flex justify-between mb-4">
+                    <span>IVA (13%)</span>
+                    <span>$10.00</span>
+                </div>-->
+
+                <div class="flex justify-between mb-4">
+                    <span>Observaciónes</span>
+                    <textarea name="" id=""></textarea>
+                </div>
+            </div>
+            <div>
+                <button class="bg-blue-500 text-white p-2 rounded-lg w-full hover:bg-blue-600" (click)="funRegistrarVenta()">Registrar Venta</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+             

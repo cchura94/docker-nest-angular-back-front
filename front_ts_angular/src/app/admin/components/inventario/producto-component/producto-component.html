@@ -1,0 +1,176 @@
+<div>
+
+    <p-toolbar class="mb-6">
+        <ng-template #start>
+            <p-button label="Nuevo Producto" icon="pi pi-plus" class="mr-2" (onClick)="openNew()" />
+        </ng-template>
+
+        <ng-template #end>
+            <p-button label="Export" icon="pi pi-upload" severity="secondary" (onClick)="exportCSV()" />
+        </ng-template>
+    </p-toolbar>
+
+    <p-table
+    #dt
+    [value]="products()"
+    [rows]="5"
+    [lazy]="true"
+    [totalRecords]="totalRecords()"
+    [loading]="loading()"
+    (onLazyLoad)="cargarDatos($event)"
+    [columns]="cols"
+    [paginator]="true"
+    [tableStyle]="{ 'min-width': '55rem' }"
+    [rowHover]="true"
+    dataKey="id"
+    currentPageReportTemplate="Mostrando {first} al {last} de {totalRecords} Productos"
+    [showCurrentPageReport]="true"
+>
+    <ng-template #caption>
+        <div class="flex items-center justify-between">
+            <h5 class="m-0">Gestión Productos</h5>
+
+            <p-select [options]="sucursales()" [(ngModel)]="selectedSucursal" optionLabel="nombre" optionValue="id" placeholder="Seleccionar Sucursal" class="w-full md:w-56" (onChange)="funGetAlmacenes()" />
+
+            <p-select [options]="almacenes()" [(ngModel)]="selectedAlmacen" optionLabel="nombre" optionValue="id" placeholder="Seleccionar Almacen" class="w-full md:w-56" (onChange)="funGetProductos()" />
+
+            <p-iconfield>
+                <p-inputicon class="pi pi-search" />
+                <input pInputText type="text" placeholder="Buscar..." [(ngModel)]="buscar" (input)="funGetProductos()" />
+            </p-iconfield>
+        </div>
+    </ng-template>
+    <ng-template #header>
+        <tr>
+            
+            <th style="min-width: 2rem">ID</th>
+            <th pSortableColumn="id" style="min-width:16rem">
+                <div class="flex items-center gap-2">
+                    Nombre
+                    <p-sortIcon field="nombre" />
+                </div>
+            </th>
+            <th>Image</th>
+            <th pSortableColumn="precio_venta_actual" style="min-width: 4rem">
+                <div class="flex items-center gap-2">
+                    Precio
+                    <p-sortIcon field="precio_venta_actual" />
+                </div>
+            </th>
+            <th pSortableColumn="category" style="min-width:8rem">
+                <div class="flex items-center gap-2">
+                    Category
+                    <p-sortIcon field="category" />
+                </div>
+            </th>
+            <th style="min-width: 12rem"></th>
+        </tr>
+    </ng-template>
+    <ng-template #body let-product>
+        <tr>
+            <td style="min-width: 2rem">{{ product.id }}</td>
+            <td style="min-width: 16rem">{{ product.nombre }}</td>
+            <td>
+                @if (product.imagen_url) {
+                    <img [src]="'http://127.0.0.1:8000/' + product.imagen_url" [alt]="product.name" style="width: 64px" class="rounded" />
+                }
+            </td>
+            <td>{{ product.precio_venta_actual | currency: 'USD' }}</td>
+            <td>{{ product.categoria.nombre }}</td>
+            <td>
+                <p-button icon="pi pi-image" class="mr-2" [rounded]="true" [outlined]="false" (click)="editImagenProduct(product)" />
+                <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="editProduct(product)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="deleteProduct(product)" />
+            </td>
+        </tr>
+    </ng-template>
+</p-table>
+
+<p-dialog [(visible)]="productDialog" [style]="{ width: '450px' }" header="Producto" [modal]="true">
+    <ng-template #content>
+        {{product | json}}
+        <div class="flex flex-col gap-6">
+            <img [src]="'https://primefaces.org/cdn/primeng/images/demo/product/' + product.imagen_url" [alt]="product.imagen_url" class="block m-auto pb-4" *ngIf="product.imagen_url" />
+            <div>
+                <label for="name" class="block font-bold mb-3">Nombre</label>
+                <input type="text" pInputText id="name" [(ngModel)]="product.nombre" required autofocus fluid />
+                <small class="text-red-500" *ngIf="submitted && !product.nombre">El campo nombre es obligatorio.</small>
+            </div>
+            <div>
+                <label for="description" class="block font-bold mb-3">Descripción</label>
+                <textarea id="description" pTextarea [(ngModel)]="product.descripcion" required rows="3" cols="20" fluid></textarea>
+            </div>
+
+            <div>
+                <span class="block font-bold mb-4">Categoria</span>
+                <div class="grid grid-cols-12 gap-4">
+                    @for (item of categorias(); track $index) {
+                        <div class="flex items-center gap-2 col-span-6">
+                            <p-radiobutton [id]="`category${item.id}`" name="category" [value]="item.id" [(ngModel)]="product.categoria_id" />
+                            <label [for]="`category${item.id}`">{{ item.nombre }}</label>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-6">
+                    <label for="price" class="block font-bold mb-3">Precio</label>
+                    <p-inputnumber id="price" [(ngModel)]="product.precio_venta_actual" mode="currency" currency="USD" locale="en-US" fluid />
+                </div>
+                
+                <div class="col-span-6">
+                    <label for="unidad_medida" class="block font-bold mb-3">unidad_medida</label>
+                    <input id="unidad_medida" pInputText [(ngModel)]="product.unidad_medida" fluid />
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-4">
+                <div class="col-span-6">
+                    <label for="fr" class="block font-bold mb-3">fecha_registro</label>
+                  
+                    <p-datepicker type="datetime" pInputText id="fr" [(ngModel)]="product.fecha_registro" fluid />
+                </div>
+                
+
+                <div class="col-span-6">
+                    <label for="marca" class="block font-bold mb-3">marca</label>
+                    <input pInputText id="marca" [(ngModel)]="product.marca" fluid />
+                </div>
+                <div class="col-span-6">
+                    <label for="stock_minimo" class="block font-bold mb-3">stock_minimo</label>
+                    <input pInputText id="stock_minimo" [(ngModel)]="product.stock_minimo" fluid />
+                </div>
+                
+            </div>
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+        <p-button label="Guardar" icon="pi pi-check" (click)="saveProduct()" />
+    </ng-template>
+</p-dialog>
+
+
+<p-dialog [(visible)]="productDialogImagen" [style]="{ width: '450px' }" header="Imagen Producto" [modal]="true">
+    <ng-template #content>
+        <div class="flex flex-col gap-6">
+            <!--
+            <img [src]="'http://127.0.0.1:8000/' + product.imagen_url" [alt]="product" class="block m-auto pb-4" />
+            -->
+            <p-fileupload name="demo[]" (uploadHandler)="funSubirImagen($event)" [customUpload]="true" [multiple]="false" accept="image/*" maxFileSize="1000000" mode="advanced">
+                <ng-template #empty>
+                    <div>Arrastrar y soltar aqui para subir Imagen.</div>
+                </ng-template>
+            </p-fileupload>
+            
+        </div>
+    </ng-template>
+
+    <ng-template #footer>
+        <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialogImagen()" />
+    </ng-template>
+</p-dialog>
+
+</div>

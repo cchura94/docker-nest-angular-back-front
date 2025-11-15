@@ -1,0 +1,39 @@
+GET http://127.0.0.1:3000/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwiaWQiOiJkYTNlOGZhNy0xZjFiLTRlZTEtODk3Yi1mNzYzZmZjMmE3MGYiLCJpYXQiOjE3NTA5MDE0OTAsImV4cCI6MTc1MDkwNTA5MH0.E8c1GPDs227a_cvLqt40BWNlElEwaOWRpRx9xZN1Rb0
+
+### Guardar Usuario
+POST http://127.0.0.1:3000/users
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlNpbW9uMTAiLCJpZCI6IjJmNTUzYzdiLTM2ZTUtNDdjZS04NjNmLTljNmJlYWE2Y2I0OCIsImlhdCI6MTc0OTUyMTU3NCwiZXhwIjoxNzQ5NTI1MTc0fQ.uF2mgL7A0ps1ubMyzL1njQ0O-CXCPltpog5Q3V8SGo4
+
+{
+    "username": "ana4",
+    "email": "ana4@mail.com",
+    "password": "ana25432111"
+}
+
+### Mostrar un usuario por ID
+GET http://127.0.0.1:3000/users/7c491683-5487-472e-a8fc-82c175d732d5
+
+### Modificar un usuario por ID
+PATCH http://127.0.0.1:3000/users/7c491683-5487-472e-a8fc-82c175d732d5
+Content-Type: application/json
+
+{
+  "username": "cristian.modificado",
+  "email": "cristian.modificado@mail.com"
+}
+### Eliminar un usuario po ID
+DELETE http://127.0.0.1:3000/users/6c4c3a26-24a4-4371-bc7f-7b336703534c
+
+
+### crear usuario con roles
+POST http://127.0.0.1:3000/users
+Content-Type: application/json
+
+{
+    "username": "Javier",
+    "email": "javier@mail.com",
+    "password": "javier54321",
+    "roleIds": ["4e3e7627-166d-4ae1-bc70-6d6bb1ffda4e", "5cc2503f-cc06-4526-9a7e-4bd716d2c475"]
+}

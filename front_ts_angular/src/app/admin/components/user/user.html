@@ -1,0 +1,80 @@
+<div class="card">
+    <p-button (click)="showDialog()" label="Nuevo Usuario" />
+    <p-dialog header="Datos de Usuario" [modal]="true" [(visible)]="visible" [style]="{ width: '25rem' }">
+        <span class="p-text-secondary block mb-8">Ingrese sus datos.</span>
+        {{userForm.value | json}}
+        <form [formGroup]="userForm">
+            <div class="flex items-center gap-4 mb-4">
+                <label for="username" class="font-semibold w-24">Nombre</label>
+                <input pInputText id="username" class="flex-auto" autocomplete="off" formControlName="name" />
+            </div>
+            <div class="flex items-center gap-4 mb-8">
+                <label for="email" class="font-semibold w-24">Correo</label>
+                <input pInputText id="email" class="flex-auto" autocomplete="off" formControlName="email" />
+            </div>
+            <div class="flex items-center gap-4 mb-8">
+                <label for="pass" class="font-semibold w-24">Contraseña</label>
+                <input type="password" pInputText id="pass" class="flex-auto" autocomplete="off" formControlName="password" />
+            </div>
+            <div class="flex justify-end gap-2">
+                <p-button label="Cancelar" severity="secondary" (click)="visible = false" />
+                <p-button label="Guardar" (click)="funGuardarUser()" [disabled]="!userForm.valid" />
+            </div>
+        </form>
+    </p-dialog>
+
+@if (users().length>0) {
+
+    <p-table [value]="users()" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template #header>
+            <tr>
+                <th>ID</th>
+                <th>NOMBRE</th>
+                <th>CORREO</th>
+                <th>ACCIÓN</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-u>
+            <tr>
+                <td>{{ u.id }}</td>
+                <td>{{ u.name }}</td>
+                <td>{{ u.email }}</td>
+                <td>
+                    <p-button icon="pi pi-pencil" class="mr-2" [rounded]="true" [outlined]="true" (click)="funEditar(u)" />
+                <p-button icon="pi pi-trash" severity="danger" [rounded]="true" [outlined]="true" (click)="funEliminar(u)" />
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+
+    <br>
+    <table class="min-w-full table-auto">
+        <thead>
+            <tr class="bg-gray-800 text-white">
+                <th class="py-2 px-4 text-left">ID</th>
+                <th class="py-2 px-4 text-left">NOMBRE</th>
+                <th class="py-2 px-4 text-left">CORREO</th>
+                <th class="py-2 px-4 text-left">ACCIONES</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (us of users(); track $index) {
+                <tr class="border-b">
+                    <td class="py-2 px-4">{{ us.id }}</td>
+                    <td class="py-2 px-4">{{ us.name }}</td>
+                    <td class="py-2 px-4">{{ us.email }}</td>
+                    <td>
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+@else{
+    <p-progressbar mode="indeterminate" [style]="{ height: '6px' }" />
+}
+
+
+
+</div>

@@ -1,0 +1,26 @@
+<div class="card">
+    <h1>Gestión Almacences</h1>
+
+    <p-select [options]="sucursales()" [(ngModel)]="selectedSucursal" optionLabel="nombre" optionValue="id" placeholder="Seleccionar Sucursal" class="w-full md:w-56" (onChange)="getAlmacenes()" />
+
+    <p-table [value]="almacenes()" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template #header>
+            <tr>
+                <th>ID</th>
+                <th>CODIGO</th>
+                <th>NOMBRE</th>
+                <th>DESCRIPCION</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-alm>
+            <tr>
+                <td>{{ alm.id }}</td>
+                <td>{{ alm.codigo }}</td>
+                <td>{{ alm.nombre }}</td>
+                <td>{{ alm.descripcion }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+            {{almacenes() | json }}
+
+</div>

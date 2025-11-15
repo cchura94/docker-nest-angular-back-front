@@ -1,0 +1,34 @@
+<nav class="bg-blue-600 p-4">
+    <div class="container max-auto flex justify-between items-center">
+
+            <a routerLink="/" class="text-white text-2xl font-bold">Mi Empresa</a>
+
+            <ul class="flex space-x-6">
+                <li>
+                    <a routerLink="/" class="text-white hover:text-gray-200">INICIO</a>
+                </li>
+                <li>
+                    <a routerLink="/nosotros" class="text-white hover:text-gray-200">NOSOTROS</a>
+                </li>
+                <li>
+                    <a routerLink="/contactos" class="text-white hover:text-gray-200">CONTACTANOS</a>
+                </li>
+                <li>
+                    <a routerLink="/servicios" class="text-white hover:text-gray-200">SERVICIOS</a>
+                </li>
+                <li>
+                    <a routerLink="/auth/login" class="text-white hover:text-gray-200">INGRESAR</a>
+                </li>
+                <li>
+                    <a routerLink="/auth/registro" class="text-white hover:text-gray-200">REGISTRARSE</a>
+                </li>
+            </ul>
+    </div>
+</nav>
+
+<section class="py-12">
+    <div class="mx-auto px-4">
+        <router-outlet />
+
+    </div>
+</section>

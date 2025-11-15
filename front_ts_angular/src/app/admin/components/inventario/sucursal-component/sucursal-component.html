@@ -1,0 +1,24 @@
+<div class="card">
+    <h1>Gestión Sucursales</h1>
+
+    <p-table [value]="sucursales()" [tableStyle]="{ 'min-width': '50rem' }">
+        <ng-template #header>
+            <tr>
+                <th>ID</th>
+                <th>NOMBRE</th>
+                <th>DIRECCION</th>
+                <th>TELEFONO</th>
+            </tr>
+        </ng-template>
+        <ng-template #body let-suc>
+            <tr>
+                <td>{{ suc.id }}</td>
+                <td>{{ suc.nombre }}</td>
+                <td>{{ suc.direccion }}</td>
+                <td>{{ suc.telefono }}</td>
+            </tr>
+        </ng-template>
+    </p-table>
+            {{sucursales() | json }}
+
+</div>
